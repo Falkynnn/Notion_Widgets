@@ -1,1 +1,20 @@
-
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML Widget Demo</title>
+    <link rel="stylesheet" href="styles.css"> <!-- Optional external CSS -->
+    <script src="script.js" defer></script> <!-- Optional external JS -->
+</head>
+<body>
+    <div class="slider-container">
+        <div class="editable-title" contenteditable="true">Editable Title</div>
+        <input type="range" id="slider" min="0" max="100" value="50" />
+        <div class="percentages">
+            <span class="editable-label" contenteditable="true">Left</span>: <span id="left-percent">50%</span> |
+            <span class="editable-label" contenteditable="true">Right</span>: <span id="right-percent">50%</span>
+        </div>
+    </div>
+</body>
+</html>
