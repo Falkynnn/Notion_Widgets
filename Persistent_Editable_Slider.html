@@ -19,55 +19,47 @@
     </div>
 
     <script>
-        // Elements
-        const slider = document.getElementById('slider');
-        const leftPercent = document.getElementById('left-percent');
-        const rightPercent = document.getElementById('right-percent');
-        const editableTitle = document.getElementById('editable-title');
-        const editableLeft = document.getElementById('editable-left');
-        const editableRight = document.getElementById('editable-right');
+        // Get a unique identifier for the widget instance (e.g., the URL)
+        const widgetId = window.location.href;
 
         // Load values from localStorage on page load
         window.onload = () => {
-            // Load slider value and percentages
-            const savedSliderValue = localStorage.getItem('sliderValue');
-            if (savedSliderValue !== null) {
-                slider.value = savedSliderValue;
-                leftPercent.textContent = `${savedSliderValue}%`;
-                rightPercent.textContent = `${100 - savedSliderValue}%`;
+            const savedConfig = localStorage.getItem(widgetId);
+            if (savedConfig) {
+                const config = JSON.parse(savedConfig);
+                // Update the UI with the retrieved configuration
+                document.getElementById('editable-title').textContent = config.title;
+                document.getElementById('editable-left').textContent = config.leftLabel;
+                document.getElementById('editable-right').textContent = config.rightLabel;
+                document.getElementById('slider').value = config.sliderValue;
+                // Update the percentages
+                document.getElementById('left-percent').textContent = `${config.sliderValue}%`;
+                document.getElementById('right-percent').textContent = `${100 - config.sliderValue}%`;
             }
-
-            // Load text content
-            const savedTitle = localStorage.getItem('editableTitle');
-            if (savedTitle !== null) editableTitle.textContent = savedTitle;
-
-            const savedLeft = localStorage.getItem('editableLeft');
-            if (savedLeft !== null) editableLeft.textContent = savedLeft;
-
-            const savedRight = localStorage.getItem('editableRight');
-            if (savedRight !== null) editableRight.textContent = savedRight;
         };
 
-        // Save slider value on input
-        slider.addEventListener('input', () => {
-            const value = slider.value;
-            leftPercent.textContent = `${value}%`;
-            rightPercent.textContent = `${100 - value}%`;
-            localStorage.setItem('sliderValue', value);
-        });
+        // Save the widget configuration
+        function saveWidgetConfig() {
+            const title = document.getElementById('editable-title').textContent;
+            const leftLabel = document.getElementById('editable-left').textContent;
+            const rightLabel = document.getElementById('editable-right').textContent;
+            const sliderValue = document.getElementById('slider').value;
 
-        // Save text content on blur (when focus leaves)
-        editableTitle.addEventListener('blur', () => {
-            localStorage.setItem('editableTitle', editableTitle.textContent);
-        });
+            const config = {
+                title,
+                leftLabel,
+                rightLabel,
+                sliderValue
+            };
 
-        editableLeft.addEventListener('blur', () => {
-            localStorage.setItem('editableLeft', editableLeft.textContent);
-        });
+            localStorage.setItem(widgetId, JSON.stringify(config));
+        }
 
-        editableRight.addEventListener('blur', () => {
-            localStorage.setItem('editableRight', editableRight.textContent);
-        });
+        // Save the configuration on user input
+        document.getElementById('slider').addEventListener('input', saveWidgetConfig);
+        document.getElementById('editable-title').addEventListener('blur', saveWidgetConfig);
+        document.getElementById('editable-left').addEventListener('blur', saveWidgetConfig);
+        document.getElementById('editable-right').addEventListener('blur', saveWidgetConfig);
     </script>
 </body>
 </html>
