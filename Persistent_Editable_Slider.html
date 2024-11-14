@@ -3,63 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Responsive Slider with Editable Title and Labels</title>
+    <title>Persistent Widgets with Unique Instance IDs</title>
     <style>
-        /* CSS styles omitted for brevity */
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+
+        .slider-container {
+            width: 90%;
+            max-width: 800px;
+            margin: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        #slider {
+            width: 100%;
+            appearance: none;
+            height: 10px;
+            background: linear-gradient(to right, #d3d3d3, #808080, #d3d3d3);
+            border-radius: 5px;
+            outline: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        #slider:hover {
+            opacity: 1;
+        }
+
+        .percentages {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .editable-label, .editable-title {
+            display: inline-block;
+            padding: 0 5px;
+            border: 1px dashed transparent;
+            cursor: text;
+            font-weight: bold;
+        }
+
+        .editable-label:focus, .editable-title:focus {
+            outline: none;
+            border: 1px dashed #ccc;
+        }
+
+        .editable-title {
+            text-decoration: underline;
+            padding: 5px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
-    <div class="slider-container">
-        <div id="editable-title" class="editable-title" contenteditable="true">Editable Title</div>
-        <input type="range" id="slider" min="0" max="100" value="50" />
+    <!-- Each widget has a unique data-instance-id -->
+    <div class="slider-container" data-instance-id="widget1">
+        <div class="editable-title" contenteditable="true">Editable Title 1</div>
+        <input type="range" class="slider" min="0" max="100" value="50" />
         <div class="percentages">
-            <span id="editable-left" class="editable-label" contenteditable="true">Left Tendency</span>: <span id="left-percent">50%</span> |
-            <span id="editable-right" class="editable-label" contenteditable="true">Right Tendency</span>: <span id="right-percent">50%</span>
+            <span class="editable-label" contenteditable="true">Left</span>: <span class="left-percent">50%</span> |
+            <span class="editable-label" contenteditable="true">Right</span>: <span class="right-percent">50%</span>
+        </div>
+    </div>
+
+    <div class="slider-container" data-instance-id="widget2">
+        <div class="editable-title" contenteditable="true">Editable Title 2</div>
+        <input type="range" class="slider" min="0" max="100" value="50" />
+        <div class="percentages">
+            <span class="editable-label" contenteditable="true">Left</span>: <span class="left-percent">50%</span> |
+            <span class="editable-label" contenteditable="true">Right</span>: <span class="right-percent">50%</span>
         </div>
     </div>
 
     <script>
-        // Get a unique identifier for the widget instance
-        const widgetId = `${new URL(window.location.href).pathname}-${Math.random().toString(36).substring(2, 8)}`;
+        // Function to initialize a slider instance
+        function initializeSliderInstance(container) {
+            const instanceId = container.getAttribute('data-instance-id');
+            const slider = container.querySelector('.slider');
+            const leftPercent = container.querySelector('.left-percent');
+            const rightPercent = container.querySelector('.right-percent');
+            const editableTitle = container.querySelector('.editable-title');
+            const editableLeft = container.querySelectorAll('.editable-label')[0];
+            const editableRight = container.querySelectorAll('.editable-label')[1];
 
-        // Load values from localStorage on page load
-        window.onload = () => {
-            const savedConfig = localStorage.getItem(widgetId);
-            if (savedConfig) {
-                const config = JSON.parse(savedConfig);
-                // Update the UI with the retrieved configuration
-                document.getElementById('editable-title').textContent = config.title;
-                document.getElementById('editable-left').textContent = config.leftLabel;
-                document.getElementById('editable-right').textContent = config.rightLabel;
-                document.getElementById('slider').value = config.sliderValue;
-                // Update the percentages
-                document.getElementById('left-percent').textContent = `${config.sliderValue}%`;
-                document.getElementById('right-percent').textContent = `${100 - config.sliderValue}%`;
+            // Load values from localStorage
+            const savedSliderValue = localStorage.getItem(`sliderValue-${instanceId}`);
+            if (savedSliderValue !== null) {
+                slider.value = savedSliderValue;
+                leftPercent.textContent = `${savedSliderValue}%`;
+                rightPercent.textContent = `${100 - savedSliderValue}%`;
             }
-        };
 
-        // Save the widget configuration
-        function saveWidgetConfig() {
-            const title = document.getElementById('editable-title').textContent;
-            const leftLabel = document.getElementById('editable-left').textContent;
-            const rightLabel = document.getElementById('editable-right').textContent;
-            const sliderValue = document.getElementById('slider').value;
+            const savedTitle = localStorage.getItem(`editableTitle-${instanceId}`);
+            if (savedTitle !== null) editableTitle.textContent = savedTitle;
 
-            const config = {
-                title,
-                leftLabel,
-                rightLabel,
-                sliderValue
-            };
+            const savedLeft = localStorage.getItem(`editableLeft-${instanceId}`);
+            if (savedLeft !== null) editableLeft.textContent = savedLeft;
 
-            localStorage.setItem(widgetId, JSON.stringify(config));
+            const savedRight = localStorage.getItem(`editableRight-${instanceId}`);
+            if (savedRight !== null) editableRight.textContent = savedRight;
+
+            // Save slider value on input
+            slider.addEventListener('input', () => {
+                const value = slider.value;
+                leftPercent.textContent = `${value}%`;
+                rightPercent.textContent = `${100 - value}%`;
+                localStorage.setItem(`sliderValue-${instanceId}`, value);
+            });
+
+            // Save text content on blur (when focus leaves)
+            editableTitle.addEventListener('blur', () => {
+                localStorage.setItem(`editableTitle-${instanceId}`, editableTitle.textContent);
+            });
+
+            editableLeft.addEventListener('blur', () => {
+                localStorage.setItem(`editableLeft-${instanceId}`, editableLeft.textContent);
+            });
+
+            editableRight.addEventListener('blur', () => {
+                localStorage.setItem(`editableRight-${instanceId}`, editableRight.textContent);
+            });
         }
 
-        // Save the configuration on user input
-        document.getElementById('slider').addEventListener('input', saveWidgetConfig);
-        document.getElementById('editable-title').addEventListener('blur', saveWidgetConfig);
-        document.getElementById('editable-left').addEventListener('blur', saveWidgetConfig);
-        document.getElementById('editable-right').addEventListener('blur', saveWidgetConfig);
+        // Initialize all slider containers on the page
+        document.querySelectorAll('.slider-container').forEach(initializeSliderInstance);
     </script>
 </body>
 </html>
