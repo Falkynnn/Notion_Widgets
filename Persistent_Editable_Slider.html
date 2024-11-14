@@ -19,8 +19,8 @@
     </div>
 
     <script>
-        // Get a unique identifier for the widget instance (e.g., the URL)
-        const widgetId = window.location.href;
+        // Get a unique identifier for the widget instance
+        const widgetId = `${new URL(window.location.href).pathname}-${Math.random().toString(36).substring(2, 8)}`;
 
         // Load values from localStorage on page load
         window.onload = () => {
