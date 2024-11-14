@@ -3,18 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTML Widget Demo</title>
-    <link rel="stylesheet" href="styles.css"> <!-- Optional external CSS -->
-    <script src="script.js" defer></script> <!-- Optional external JS -->
+    <title>Responsive Slider with Editable Title and Labels</title>
+    <style>
+        body {
+            font-family: Segoe UI, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            /*background-color: #f4f4f4;*/
+        }
+
+        .slider-container {
+            width: 90%;
+            /*max-width: 800px;*/
+            margin: 20px;
+            text-align: center;
+        }
+
+        #slider {
+            width: 100%;
+            appearance: none;
+            height: 10px;
+            background: linear-gradient(to right, #ADB5BD, #343A40, #ADB5BD);
+            border-radius: 5px;
+            outline: none;
+            opacity: 0.9;
+            transition: opacity 0.2s;
+        }
+
+        #slider:hover {
+            opacity: 1;
+        }
+
+        .percentages {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .editable-label {
+            display: inline-block;
+            padding: 0 5px;
+            border: 1px dashed transparent;
+            cursor: text;
+            font-weight: bold;
+        }
+
+        .editable-label:focus {
+            outline: none;
+            border: 1px dashed #ccc;
+        }
+
+        .editable-title {
+            font-weight: bold;
+            text-decoration: underline;
+            padding: 5px;
+            margin-bottom: 15px;
+            border: 1px dashed transparent;
+            cursor: text;
+        }
+
+        .editable-title:focus {
+            outline: none;
+            border: 1px dashed #ccc;
+        }
+    </style>
 </head>
 <body>
     <div class="slider-container">
         <div class="editable-title" contenteditable="true">Editable Title</div>
         <input type="range" id="slider" min="0" max="100" value="50" />
         <div class="percentages">
-            <span class="editable-label" contenteditable="true">Left</span>: <span id="left-percent">50%</span> |
-            <span class="editable-label" contenteditable="true">Right</span>: <span id="right-percent">50%</span>
+            <span class="editable-label" contenteditable="true">Left Tendency</span>: <span id="left-percent">50%</span> |
+            <span class="editable-label" contenteditable="true">Right Tendency</span>: <span id="right-percent">50%</span>
         </div>
     </div>
+
+    <script>
+        const slider = document.getElementById('slider');
+        const leftPercent = document.getElementById('left-percent');
+        const rightPercent = document.getElementById('right-percent');
+
+        slider.addEventListener('input', () => {
+            const value = slider.value;
+            leftPercent.textContent = `${value}%`;
+            rightPercent.textContent = `${100 - value}%`;
+        });
+    </script>
 </body>
 </html>
